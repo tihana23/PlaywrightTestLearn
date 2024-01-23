@@ -32,3 +32,20 @@ test("Login process test with valid credentials", async ({ page }) => {
   await page.click('button[onclick="logIn()"]');
   await expect(page.locator("a#nameofuser")).toContainText("Welcome tihana");
 });
+test("Verify Login with wrong credentials", async ({ page }) => {
+  page.on("dialog", async (dialog) => {
+    const text = dialog.message();
+    console.log(text);
+    expect(dialog.message()).toBe("Wrong password.");
+    await dialog.accept();
+  });
+  await page.goto("https://www.demoblaze.com/");
+  await page.click("a#login2");
+  const username1 = "tihana";
+  const password1 = "124535";
+  await page.fill('input[id="loginusername"]', username1);
+  await page.fill('input[id="loginpassword"]', password1);
+  await page.waitForTimeout(3000);
+  await page.click('button[onclick="logIn()"]');
+  await page.waitForTimeout(3000);
+});
