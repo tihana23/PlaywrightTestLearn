@@ -1,23 +1,16 @@
 import { faker } from "@faker-js/faker";
-import {
-  test,
-  expect,
-  chromium,
-  Browser,
-  BrowserContext,
-  Page,
-  Dialog,
-} from "@playwright/test";
-const username = faker.person.firstName();
-const password = faker.person.lastName();
+import { test, expect } from "@playwright/test";
+import { popuUpMessage } from "../ReusableMethod/Methods";
 
 test("Verify Login without any creds", async ({ page }) => {
-  page.on("dialog", async (dialog) => {
-    const text = dialog.message();
-    console.log(text);
-    expect(dialog.message()).toBe("Please fill out Username and Password.");
-    await dialog.accept();
-  });
+  await popuUpMessage(
+    page,
+    "Please fill out Username and Password.",
+    async (dialog) => {
+      await dialog.accept();
+    }
+  );
+
   await page.goto("https://www.demoblaze.com/  ");
   await page.click("a#login2");
   await page.click('button[onclick="logIn()"]');
@@ -27,25 +20,29 @@ test("Login process test with valid credentials", async ({ page }) => {
   await page.click("a#login2");
   const username1 = "tihana";
   const password1 = "123456";
-  await page.fill('input[id="loginusername"]', username1);
-  await page.fill('input[id="loginpassword"]', password1);
+  const userNameTextbox = page.locator("#loginusername");
+  await userNameTextbox.waitFor();
+  await userNameTextbox.fill(username1);
+  const passwordTextbox = page.locator("#loginpassword");
+  await passwordTextbox.waitFor();
+  await passwordTextbox.fill(password1);
   await page.click('button[onclick="logIn()"]');
   await expect(page.locator("a#nameofuser")).toContainText("Welcome tihana");
 });
 test("Verify Login with wrong credentials", async ({ page }) => {
-  page.on("dialog", async (dialog) => {
-    const text = dialog.message();
-    console.log(text);
-    expect(dialog.message()).toBe("Wrong password.");
+  await popuUpMessage(page, "Wrong password.", async (dialog) => {
     await dialog.accept();
   });
   await page.goto("https://www.demoblaze.com/");
-  await page.click("a#login2");
+  const loginButton = page.locator("a#login2");
+  await loginButton.click();
   const username1 = "tihana";
   const password1 = "124535";
-  await page.fill('input[id="loginusername"]', username1);
-  await page.fill('input[id="loginpassword"]', password1);
-  await page.waitForTimeout(3000);
+  const userNameTextbox = page.locator("#loginusername");
+  await userNameTextbox.waitFor();
+  await userNameTextbox.fill(username1);
+  const passwordTextbox = page.locator("#loginpassword");
+  await passwordTextbox.waitFor();
+  await passwordTextbox.fill(password1);
   await page.click('button[onclick="logIn()"]');
-  await page.waitForTimeout(3000);
 });
