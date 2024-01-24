@@ -170,12 +170,14 @@ test("Verify that one item from home page and Monitors categories can be selecte
   await cartLink.click();
   await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
   const monitorChar = page.getByText("Apple monitor 24");
+  await page.waitForTimeout(2000);
   await expect(monitorChar).toBeVisible();
   const linkDelete = page.getByText("Delete");
+  await page.waitForTimeout(2000);
   await expect(linkDelete).toBeVisible();
   await linkDelete.click();
   await page.waitForTimeout(2000);
-  await page.waitForTimeout(2000);
+
   await expect(monitorChar).toBeHidden();
 });
 test("Verify that cart Total is calculated correctly", async ({ page }) => {
@@ -206,10 +208,11 @@ test("Verify that cart Total is calculated correctly", async ({ page }) => {
   const monitorChar = page.getByText("Apple monitor 24");
   await expect(monitorChar).toBeVisible();
   const linkDelete = page.getByText("Delete");
+  await page.waitForTimeout(2000);
   await expect(linkDelete).toBeVisible();
   await linkDelete.click();
   await page.waitForTimeout(2000);
-  await page.waitForTimeout(2000);
+
   await expect(monitorChar).toBeHidden();
 });
 test("Verify total in cart is calculated correctly", async ({ page }) => {
@@ -250,9 +253,9 @@ test("Verify total in cart is calculated correctly", async ({ page }) => {
   console.log(`Expected Total: ${expectedTotal}, Actual Total: ${actualTotal}`);
   expect(expectedTotal).toBe(actualTotal);
 });
-test("Verify that Place order is working correcly..not so much but...", async () => {
-  const browser: Browser = await chromium.launch({ headless: false });
-  const page: Page = await browser.newPage();
+test("Verify that Place order is working correcly..not so much but...", async ({
+  page,
+}) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
 
   const addProductToCart = async (productName: string) => {
@@ -350,10 +353,9 @@ test("Verify that Place order is working correcly..not so much but...", async ()
   expect(firstNameUsed).toBe(name);
 });
 
-test("Verify that popup window appeared if data is not populated", async () => {
-  const browser: Browser = await chromium.launch({ headless: false });
-  const page: Page = await browser.newPage();
-
+test("Verify that popup window appeared if data is not populated", async ({
+  page,
+}) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
 
   const addProductToCart = async (productName: string) => {
@@ -382,10 +384,9 @@ test("Verify that popup window appeared if data is not populated", async () => {
   await page.waitForTimeout(5000);
   await buttonPurchase.click();
 });
-test("Verify that Close button inside place order working and Place order window is closed", async () => {
-  const browser: Browser = await chromium.launch({ headless: false });
-  const page: Page = await browser.newPage();
-
+test("Verify that Close button inside place order working and Place order window is closed", async ({
+  page,
+}) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
 
   await page.click("#cartur");
