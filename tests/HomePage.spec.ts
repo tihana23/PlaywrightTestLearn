@@ -26,7 +26,7 @@ test("Verify that homepage load test", async ({ page }) => {
 
 test("Verify that contact page is open correctly", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
-  const contactsLink = page.locator("a.nav-link", { hasText: "Contact" });
+  const contactsLink = page.getByRole("link", { name: "Contact" });
 
   await contactsLink.click();
   await page.waitForSelector("label.form-control-label", {
@@ -41,7 +41,7 @@ test("Verify that contact page is open correctly", async ({ page }) => {
 
 test("Verify that About us can be oppened correctly", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
-  const aboutUsLink = page.locator("a.nav-link", { hasText: "About us" });
+  const aboutUsLink = page.getByRole("link", { name: "About us" });
   aboutUsLink.click();
   const closeButton = page.locator(
     "#videoModal .modal-footer >> button.btn.btn-secondary",
@@ -52,21 +52,21 @@ test("Verify that About us can be oppened correctly", async ({ page }) => {
 
 test("Verify that Chart page is oppened correctly", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
+  const cartLink = page.getByRole("link", { name: "Cart" });
   await cartLink.click();
   await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
 });
 
 test("Verify that Login popup is oppened correctly", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
-  const loginLink = page.locator("a.nav-link", { hasText: "Log in" });
+  const loginLink = page.getByRole("link", { name: "Log in" });
   loginLink.click();
   const logInCloseButton = page.locator("#logInModal .close");
   await expect(logInCloseButton).toBeVisible();
 });
 test("Verify that Register popup is oppened correctly", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
-  const registerLink = page.locator("a.nav-link", { hasText: "Sign up" });
+  const registerLink = page.getByRole("link", { name: "Sign up" });
   registerLink.click();
   const registerCloseButton = page.locator("#signInModal .close");
 

@@ -66,7 +66,6 @@ test("Verify that one item from home page can be selected and visible on the cha
   await expect(linkDelete).toBeVisible();
   await linkDelete.click();
   await page.waitForTimeout(2000);
-  await page.waitForTimeout(2000);
   await expect(tdSamsungGalaxy).toBeHidden();
 });
 
@@ -103,7 +102,6 @@ test("Verify that one item from home page and Phone categories can be selected a
   await expect(linkDelete).toBeVisible();
   await linkDelete.click();
   await page.waitForTimeout(2000);
-  await page.waitForTimeout(2000);
   await expect(tdSamsungGalaxy).toBeHidden();
 });
 test("Verify that one item from home page and Laptops categories can be selected and visible on the char page and deleted", async ({
@@ -138,7 +136,6 @@ test("Verify that one item from home page and Laptops categories can be selected
   const linkDelete = page.getByText("Delete");
   await expect(linkDelete).toBeVisible();
   await linkDelete.click();
-  await page.waitForTimeout(2000);
   await page.waitForTimeout(2000);
   await expect(laptopChar).toBeHidden();
 });
@@ -177,7 +174,6 @@ test("Verify that one item from home page and Monitors categories can be selecte
   await expect(linkDelete).toBeVisible();
   await linkDelete.click();
   await page.waitForTimeout(2000);
-
   await expect(monitorChar).toBeHidden();
 });
 test("Verify that cart Total is calculated correctly", async ({ page }) => {
