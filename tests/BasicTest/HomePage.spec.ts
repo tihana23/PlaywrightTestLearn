@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { verifyNextAndPreviousButton } from "../ReusableMethod/Methods";
+import { verifyNextAndPreviousButton } from "../../ReusableMethod/Methods";
 
 test("Verify that webpage has title", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { test, expect } from "@playwright/test";
-import { popuUpMessage } from "../ReusableMethod/Methods";
+import { popuUpMessage } from "../../ReusableMethod/Methods";
 const username = faker.person.firstName();
 const password = faker.person.lastName();
 
@@ -82,9 +82,7 @@ test("Verified that contact form can be filled correctly", async ({ page }) => {
 });
 
 test("Verify that contact can be saved correctly", async ({ page }) => {
-  await popuUpMessage(page, "Thanks for the message!!", async (dialog) => {
-    await dialog.accept();
-  });
+  await popuUpMessage(page, "Thanks for the message!!");
   await page.goto("https://www.demoblaze.com/");
   const contactsLink = page.locator("a.nav-link", { hasText: "Contact" });
   await contactsLink.click();

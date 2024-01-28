@@ -1,14 +1,10 @@
 import { expect, Page, Dialog, Locator } from "@playwright/test";
 
-export async function popuUpMessage(
-  page: Page,
-  expectedMessage: string,
-  responseAction: (dialog: Dialog) => Promise<void>
-) {
-  page.on("dialog", async (dialog) => {
+export async function popuUpMessage(page: Page, expectedMessage: string) {
+  page.once("dialog", async (dialog: Dialog) => {
     const text = dialog.message();
     expect(text).toBe(expectedMessage);
-    await responseAction(dialog);
+    await dialog.accept(); // Standard response action, e.g., accepting the dialog
   });
 }
 export async function addProductToCart(
@@ -36,6 +32,7 @@ export async function getPriceFromCart(
     return 0;
   }
 }
+
 export async function verifyNextAndPreviousButton(
   page: Page,
   buttonSelector: Locator,
@@ -55,4 +52,11 @@ export async function verifyNextAndPreviousButton(
     // Adjust timeout as needed for slide transition
     await page.waitForTimeout(1000);
   }
+}
+export async function scrollFullPage(page) {
+  await this.page.evaluate(async () => {
+    for (let i = 0; i < document.body.scrollHeight; i += 100) {
+      window.scrollTo(0, i);
+    }
+  });
 }

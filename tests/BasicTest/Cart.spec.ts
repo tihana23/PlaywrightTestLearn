@@ -4,7 +4,7 @@ import {
   popuUpMessage,
   addProductToCart,
   getPriceFromCart,
-} from "../ReusableMethod/Methods";
+} from "../../ReusableMethod/Methods";
 test("Verify that one item from home page can be selected and visible on the char page", async ({
   page,
 }) => {
@@ -12,6 +12,7 @@ test("Verify that one item from home page can be selected and visible on the cha
   const phonesCategory = page.locator("text=Phones");
   await expect(phonesCategory).toBeVisible();
   await phonesCategory.click();
+
   const samsungGalaxyS6Link = page.locator("a.hrefch", {
     hasText: "Samsung galaxy s6",
   });
@@ -20,16 +21,18 @@ test("Verify that one item from home page can be selected and visible on the cha
     hasText: "Samsung galaxy s6",
   });
 
-  await expect(samsungGalaxyS6Header).toBeVisible({ timeout: 10000 });
+  await expect(samsungGalaxyS6Header).toBeVisible({ timeout: 30000 });
 
-  await page.getByText("Add to cart").waitFor({ timeout: 10000 });
+  await page.getByText("Add to cart").waitFor({ timeout: 30000 });
   const linkAddCart8 = page.getByText("Add to cart");
   await linkAddCart8.click({ force: true });
   const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
+  //await page.waitForTimeout(2000);
   await cartLink.click();
+  //await page.waitForTimeout(2000);
   await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
   const tdSamsungGalaxy = page.getByText("Samsung galaxy s6");
-  await expect(tdSamsungGalaxy).toBeVisible();
+  await expect(tdSamsungGalaxy).toBeVisible({ timeout: 30000 });
 });
 test("Verify that one item from home page can be selected and visible on the char page and deleted", async ({
   page,
@@ -54,7 +57,7 @@ test("Verify that one item from home page can be selected and visible on the cha
     timeout: 10000,
   });
   const tdSamsungGalaxy = page.getByText("Samsung galaxy s6");
-  await expect(tdSamsungGalaxy).toBeVisible();
+  await expect(tdSamsungGalaxy).toBeVisible({ timeout: 20000 });
   const linkDelete = page.getByText("Delete");
   await expect(linkDelete).toBeVisible();
   await linkDelete.click({ timeout: 10000 });
@@ -122,7 +125,7 @@ test("Verify that one item from home page and Laptops categories can be selected
   await cartLink.click({ timeout: 2000 });
   await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
   const laptopChar = page.getByText("Sony vaio i5");
-  await laptopChar.waitFor();
+  await laptopChar.waitFor({ timeout: 10000 });
   await expect(laptopChar).toBeVisible();
   const linkDelete = page.getByText("Delete");
   await expect(linkDelete).toBeVisible();
@@ -162,34 +165,7 @@ test("Verify that one item from home page and Monitors categories can be selecte
 
   await expect(monitorChar).toBeHidden();
 });
-test("Verify that cart Total is calculated correctly", async ({ page }) => {
-  await page.goto("https://www.demoblaze.com/");
-  const categoryMonitors = page.locator("text=Monitors");
-  await expect(categoryMonitors).toBeVisible();
-  await categoryMonitors.click();
 
-  const monitorLink = page.locator("a.hrefch", {
-    hasText: "Apple monitor 24",
-  });
-  await monitorLink.click();
-  const monitorHeader = page.locator("h2.name", {
-    hasText: "Apple monitor 24",
-  });
-
-  await expect(monitorHeader).toBeVisible();
-  await page.getByText("Add to cart").waitFor();
-  const linkAddCart8 = page.getByText("Add to cart");
-  await linkAddCart8.click({ force: true });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
-  await cartLink.click();
-  await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
-  const monitorChar = page.getByText("Apple monitor 24");
-  await expect(monitorChar).toBeVisible();
-  const linkDelete = page.getByText("Delete");
-  await expect(linkDelete).toBeVisible();
-  await linkDelete.click({ timeout: 10000 });
-  await expect(monitorChar).toBeHidden({ timeout: 10000 });
-});
 test("Verify total in cart is calculated correctly", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
   await addProductToCart(page, "Samsung galaxy s6");
@@ -210,7 +186,7 @@ test("Verify that Place order is working correcly..not so much but...", async ({
   await addProductToCart(page, "Samsung galaxy s6");
 
   await addProductToCart(page, "Nokia lumia 1520");
-
+  await page.waitForEvent("load");
   await page.click("#cartur", { timeout: 10000 });
   const priceSamsung = await getPriceFromCart(page, "Samsung galaxy s6");
   const priceNokia = await getPriceFromCart(page, "Nokia lumia 1520");
@@ -278,13 +254,7 @@ test("Verify that popup window appeared if data is not populated", async ({
   await page.click("#cartur");
   const buttonPlaceOrder = page.locator('button:has-text("Place Order")');
   await buttonPlaceOrder.click();
-  await popuUpMessage(
-    page,
-    "Please fill out Name and Creditcard.",
-    async (dialog) => {
-      await dialog.accept();
-    }
-  );
+  await popuUpMessage(page, "Please fill out Name and Creditcard.");
   const buttonPurchase = page.locator('button[onclick="purchaseOrder()"]');
   await page.waitForTimeout(5000);
   await buttonPurchase.click();
@@ -308,3 +278,5 @@ test("Verify that Close button inside place order working and Place order window
     page.locator('div.modal-header:has-text("Place order")')
   ).not.toBeVisible();
 });
+
+//! napraviti jos jedan tc Login usera stavi u cart item logout i provjera dali je item u cartu

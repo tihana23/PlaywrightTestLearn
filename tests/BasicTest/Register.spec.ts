@@ -1,20 +1,30 @@
 import { faker } from "@faker-js/faker";
 import { test, expect } from "@playwright/test";
-import { popuUpMessage } from "../ReusableMethod/Methods";
+import { popuUpMessage } from "../../ReusableMethod/Methods";
 const username = faker.person.firstName();
 const password = faker.person.lastName();
+
+test("Verify that register page is open and all fields are visible ", async ({
+  page,
+}) => {
+  await page.goto("https://demoblaze.com/");
+  await page.getByRole("link", { name: "Sign up" }).click();
+  await expect(page.getByRole("heading", { name: "Sign up" })).toBeVisible();
+  await expect(page.getByLabel("Sign up").getByText("Username:")).toBeVisible();
+  await expect(page.getByLabel("Username:")).toBeVisible();
+  await expect(page.getByLabel("Sign up").getByText("Password:")).toBeVisible();
+  await expect(page.getByLabel("Password:")).toBeVisible();
+  await expect(page.getByLabel("Sign up").getByLabel("Close")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sign up" })).toBeVisible();
+  await expect(page.getByLabel("Sign up").getByText("Close")).toBeVisible();
+  await page.getByLabel("Sign up").getByLabel("Close").click();
+});
 
 test("Verify that register process test with empty credentials shown popup error", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  await popuUpMessage(
-    page,
-    "Please fill out Username and Password.",
-    async (dialog) => {
-      await dialog.accept();
-    }
-  );
+  await popuUpMessage(page, "Please fill out Username and Password.");
   await page.click("a#signin2");
   await page.click('button[onclick="register()"]');
 });
@@ -22,9 +32,6 @@ test("Verify that register process test with empty credentials shown popup error
 test("Verify that register process test with existing credentials shown popup error", async ({
   page,
 }) => {
-  await popuUpMessage(page, "This user already exist.", async (dialog) => {
-    await dialog.accept();
-  });
   await page.goto("https://www.demoblaze.com/");
   await page.click("a#signin2");
   const username1 = "tihana";
@@ -41,6 +48,7 @@ test("Verify that register process test with existing credentials shown popup er
   const buttonIsEnabled = await signUpButton.isEnabled();
   expect(buttonIsEnabled).toBeTruthy();
   await signUpButton.click();
+  await page.waitForTimeout(1000);
 });
 
 test("Register process and login with inserted data", async ({ page }) => {

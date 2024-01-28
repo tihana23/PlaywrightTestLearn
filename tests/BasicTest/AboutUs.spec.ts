@@ -4,9 +4,8 @@ test('Verify that About us page have title and close button(video is not working
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  const aboutUsLink = page
-    .locator("a.nav-link", { hasText: "About us" })
-    .click();
+  const aboutUsLink = page.locator("a.nav-link", { hasText: "About us" });
+  await aboutUsLink.click();
   const video = page.locator("#videoModalLabel");
   await expect(video).toBeVisible();
   const closeButton = page.locator(
