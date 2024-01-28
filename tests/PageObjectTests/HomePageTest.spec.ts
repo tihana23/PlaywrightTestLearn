@@ -106,8 +106,11 @@ test("Verify that one from Home Page item can be clicked and visible on the Char
 }) => {
   const homePage = new HomePage(page);
   const cartPage = new CartPage(page);
+  const productPage = new ProductPage(page);
   await homePage.goToHomePage();
   await homePage.selectProduct("Nokia lumia 1520");
+  await productPage.addProductToCart();
+  await homePage.navigateToCart();
   await cartPage.verifyProductInCart("Nokia lumia 1520");
 });
 
