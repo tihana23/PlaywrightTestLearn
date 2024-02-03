@@ -1,4 +1,4 @@
-import { test} from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { HomePage } from "../../pages/HomePage";
 import { AboutUsPage } from "../../pages/AboutUsPage";
 import { CartPage } from "../../pages/CartPage";
@@ -44,7 +44,7 @@ test("Verify that Login popup is oppened correctly", async ({ page }) => {
   const navigationBar = new NavigationBar(page);
   await homePage.goTo();
   await navigationBar.navigateToLogin();
-  await loginPage.verifyLoginPageAllElementsAteVisible();
+  await expect(loginPage.loginHeading).toBeVisible();
 });
 test("Verify that Register popup is oppened correctly", async ({ page }) => {
   const homePage = new HomePage(page);
