@@ -29,12 +29,14 @@ class CartPage {
   readonly placeOrderPopupPurchaseButton: Locator;
   readonly placeOrderPopupCloseButton: Locator;
   readonly pageTotalCart: Locator;
-
   readonly pageProductsGridPicture: Locator;
   readonly pageProductsGridTitle: Locator;
   readonly pageProducGridPrice: Locator;
   readonly pageProducGridX: Locator;
   readonly placeOrderPopupTextboxName: Locator;
+  readonly thankYouMessageLocator: Locator;
+  readonly popupAmount: Locator;
+  readonly popupName: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -46,13 +48,7 @@ class CartPage {
     this.pageProducGridX = page.getByRole("cell", { name: "x" });
     this.deleteButton = page.getByRole("link", { name: "Delete" });
     this.purchaseButton = page.locator('button:has-text("Place Order")');
-    this.closeButton = page.locator(
-      "xpath=/html/body/div[3]/div/div/div[3]/button[1]"
-    );
     this.totalAmount = page.locator("#totalp");
-    this.placeOrderModalHeader = page.locator(
-      'div.modal-header:has-text("Place order")'
-    );
     this.productNameLocator = (productName: string) =>
       page.getByRole("cell", { name: productName });
     this.placeOrderButtonCartPage = page.getByRole("button", {
@@ -83,22 +79,11 @@ class CartPage {
     this.placeOrderPopupCloseButton = page
       .getByLabel("Place order")
       .getByText("Close");
-  }
-
-  async verifyCurrentURL() {
-    await expect(this.page).toHaveURL("https://www.demoblaze.com/cart.html");
-  }
-  async verifyPageTitle() {
-    await expect(this.pageTitleCart).toBeVisible();
-  }
-
-  async verifyVisabilityAllElementsOnPage() {
-    await expect(this.pageTitleCart).toBeVisible();
-    await expect(this.pageTotalCart).toBeVisible();
-    await expect(this.pageProductsGridPicture).toBeVisible();
-    await expect(this.pageProductsGridTitle).toBeVisible();
-    await expect(this.pageProducGridPrice).toBeVisible();
-    await expect(this.pageProducGridX).toBeVisible();
+    this.thankYouMessageLocator = page.locator(
+      'h2:has-text("Thank you for your purchase!")'
+    );
+    this.popupAmount = page.locator("p.lead.text-muted");
+    this.popupName = page.locator("p.lead.text-muted >> text=/Name: .+/");
   }
 
   async verifyVisabilityAllElementsOnPopupPlaceOrderPage() {
@@ -118,13 +103,16 @@ class CartPage {
     await expect(this.placeOrderPopupPurchaseButton).toBeVisible();
     await expect(this.placeOrderPopupCloseButton).toBeVisible();
   }
-  async clickPlaceOrderButton() {
-    await this.placeOrderButtonCartPage.click();
-    await expect(this.placeOrderPopupHeading).toBeVisible();
+
+  async verifyVisabilityAllElementsInCartPage() {
+    await expect(this.pageTitleCart).toBeVisible();
+    await expect(this.pageTotalCart).toBeVisible();
+    await expect(this.pageProductsGridPicture).toBeVisible();
+    await expect(this.pageProductsGridTitle).toBeVisible();
+    await expect(this.pageProducGridPrice).toBeVisible();
+    await expect(this.pageProducGridX).toBeVisible();
   }
-  async clickPurchaseButton() {
-    await this.placeOrderPopupPurchaseButton.click();
-  }
+
   async verifyProductInCart(productName: string) {
     const productLocator = this.productNameLocator(productName);
     await expect(productLocator).toBeVisible({ timeout: 50000 });
@@ -133,8 +121,6 @@ class CartPage {
     await this.page.waitForLoadState("networkidle");
     const productLocators = this.productNameLocator(productName);
     const count = await productLocators.count();
-
-    // Check if there's at least one element with the product name
     expect(count).toBeGreaterThan(0);
   }
 
@@ -157,70 +143,49 @@ class CartPage {
     expect(expectedTotal).toBe(actualTotal);
   }
 
-  async closePlaceOrderPopupOnCloseButton() {
-    await this.placeOrderPopupCloseButton.click();
-    await expect(this.placeOrderModalHeader).not.toBeVisible();
+  async generateRandomOrderData() {
+    return {
+      name: faker.person.firstName(),
+      country: faker.location.country(),
+      city: faker.location.city(),
+      card: faker.finance.creditCardNumber(),
+      month: faker.date.month(),
+      year: faker.date.future().getFullYear().toString(),
+    };
   }
-  async closePlaceOrderPopupOnXButton() {
-    await this.placeOrderPopupXCloseButton.click();
-    await expect(this.placeOrderModalHeader).not.toBeVisible();
+
+  async fillData() {
+    const orderData = await this.generateRandomOrderData();
+    await this.placeOrderPopupTextboxName.fill(orderData.name);
+    await this.placeOrderPopupTextboxCountry.fill(orderData.country);
+    await this.placeOrderPopupTextboxCity.fill(orderData.city);
+    await this.placeOrderPopupTextboxCreditCard.fill(orderData.card);
+    await this.placeOrderPopupTextboxMonth.fill(orderData.month);
+    await this.placeOrderPopupTextboxYear.fill(orderData.year);
+    return orderData;
   }
+
+  async getTextContent(locator, regex) {
+    const text = await locator.textContent();
+    return text && regex ? (text.match(regex) || [])[1] : text;
+  }
+
   async placeOrderWithRandomData(expectedTotal: number) {
-    await this.purchaseButton.click();
-    await expect(this.placeOrderModalHeader).toBeVisible();
-
-    // Fill in the Place Order form with random data
-    const name = faker.person.firstName();
-    const country = faker.location.country();
-    const city = faker.location.city();
-    const card = faker.finance.creditCardNumber();
-    const month = faker.date.month();
-    const year = faker.date.future().getFullYear().toString();
-
-    await this.placeOrderPopupTextboxName.fill(name);
-    await this.placeOrderPopupTextboxCountry.fill(country);
-    await this.placeOrderPopupTextboxCity.fill(city);
-    await this.placeOrderPopupTextboxCreditCard.fill(card);
-    await this.placeOrderPopupTextboxMonth.fill(month);
-    await this.placeOrderPopupTextboxYear.fill(year);
-
+    await this.placeOrderButtonCartPage.click();
+    const orderData = await this.fillData();
     await this.placeOrderPopupPurchaseButton.click();
-
-    // Verify the order confirmation
-    const thankYouMessageLocator = this.page.locator(
-      'h2:has-text("Thank you for your purchase!")'
-    );
-    await expect(thankYouMessageLocator).toContainText(
+    await expect(this.thankYouMessageLocator).toContainText(
       "Thank you for your purchase!"
     );
-    const amountPopup = this.page.locator("p.lead.text-muted");
-    const namePopup = this.page.locator("p.lead.text-muted >> text=/Name: .+/");
-    const tyMessageExpected = "Thank you for your purchase!";
-    const thankYouMessageTextActual = await thankYouMessageLocator.textContent({
-      timeout: 30000,
-    });
-    expect(tyMessageExpected).toEqual(thankYouMessageTextActual);
-    const amountText = await amountPopup.textContent({ timeout: 30000 });
-    // Initialize a variable to hold the parsed amount
-    let amount = 0;
-    if (amountText !== null) {
-      const amountMatch = amountText.match(/Amount: (\d+) USD/);
-      if (amountMatch) {
-        amount = parseFloat(amountMatch[1]);
-      }
-    }
+    const amountFromPopup =
+      parseFloat(
+        await this.getTextContent(this.popupAmount, /Amount: (\d+) USD/)
+      ) || 0;
+    const nameFromPopup =
+      (await this.getTextContent(this.popupName, /Name: (.+?)(?=Date)/)) || "";
 
-    const nameText = await namePopup.textContent();
-    let nameFromPopup = "";
-    if (nameText !== null) {
-      const nameMatch = nameText.match(/Name: (.+?)(?=Date)/);
-      if (nameMatch) {
-        nameFromPopup = nameMatch[1].trim();
-      }
-    }
-
-    expect(expectedTotal).toBe(amount);
-    expect(nameFromPopup).toBe(name);
+    expect(expectedTotal).toBe(amountFromPopup);
+    expect(nameFromPopup).toBe(orderData.name);
   }
 }
 export { CartPage };

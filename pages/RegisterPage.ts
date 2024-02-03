@@ -1,9 +1,11 @@
 import { Page, Locator, expect } from "@playwright/test";
+import { popuUpMessage } from "../ReusableMethod/Methods";
+
 
 class RegisterPage {
   readonly page: Page;
-  readonly headerText: Locator;
-  readonly usernameLabel: Locator;
+  readonly registerHeading: Locator;
+  readonly userNameLabel: Locator;
   readonly passwordLabel: Locator;
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
@@ -11,12 +13,10 @@ class RegisterPage {
   readonly closeXButton: Locator;
   readonly closeButton: Locator;
 
-  //dodati jos ostale x i to
-
   constructor(page: Page) {
     this.page = page;
-    this.headerText = page.getByRole("heading", { name: "Sign up" });
-    this.usernameLabel = page.getByLabel("Username:");
+    this.registerHeading = page.getByRole("heading", { name: "Sign up" });
+    this.userNameLabel = page.getByLabel("Username:");
     this.passwordLabel = page.getByLabel("Password:");
     this.usernameInput = page.locator('input[id="sign-username"]');
     this.passwordInput = page.locator('input[id="sign-password"]');
@@ -24,27 +24,15 @@ class RegisterPage {
     this.closeXButton = page.getByLabel("Sign up").getByText("Close");
     this.closeButton = page.getByLabel("Sign up").getByLabel("Close");
   }
-  async verifySignUpFormElementsAreVisible() {
-    await expect(this.headerText).toBeVisible();
-    await expect(this.usernameLabel).toBeVisible();
-    await expect(this.passwordLabel).toBeVisible();
+
+  async verifyThatAllElementsAreVisibleOnRegisterPage() {
     await expect(this.usernameInput).toBeVisible();
     await expect(this.passwordInput).toBeVisible();
     await expect(this.signUpButton).toBeVisible();
-    await expect(this.closeXButton).toBeVisible();
     await expect(this.closeButton).toBeVisible();
-  }
-
-  async closeSignUpForm() {
-    await this.closeButton.click();
-  }
-  async closeLoginOnXButton() {
-    await this.closeXButton.click();
-  }
-
-  async verifyThatTextCanBeWrittenInUsernameAndPassword() {
-    await this.usernameInput.fill("username");
-    await this.passwordInput.fill("password");
+    await expect(this.registerHeading).toBeVisible();
+    await expect(this.userNameLabel).toBeVisible();
+    await expect(this.passwordLabel).toBeVisible();
   }
 
   async fillSignUpForm(username: string, password: string) {
@@ -52,8 +40,12 @@ class RegisterPage {
     await this.passwordInput.fill(password);
   }
 
-  async submitSignUpForm() {
+  async registerNewUser(username: string, password: string) {
+    await popuUpMessage(this.page, "Sign up successful.");
+
+    await this.fillSignUpForm(username, password);
     await this.signUpButton.click();
+    await this.page.waitForTimeout(1000);
   }
 }
 export { RegisterPage };

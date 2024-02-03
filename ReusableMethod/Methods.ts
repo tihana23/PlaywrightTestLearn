@@ -1,4 +1,8 @@
 import { expect, Page, Dialog, Locator } from "@playwright/test";
+import { NavigationBar } from "../pages/NavigationBar";
+import { ContactPage } from "../pages/ContactPage";
+import { HomePage } from "../pages/HomePage";
+import { AboutUsPage } from "../pages/AboutUsPage";
 
 export async function popuUpMessage(page: Page, expectedMessage: string) {
   page.once("dialog", async (dialog: Dialog) => {
@@ -59,4 +63,6 @@ export async function scrollFullPage(page) {
       window.scrollTo(0, i);
     }
   });
+
+ 
 }

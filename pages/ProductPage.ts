@@ -25,13 +25,10 @@ class ProductPage {
     await expect(this.productDescription).toBeVisible();
     await expect(this.addToCartButton).toBeVisible();
   }
-  //!it is not working
-  async verifyPopupLoginMessageForAddingProduct() {
-    await popuUpMessage(this.page, "");
-  }
-
+ 
   async addProductToCart() {
     await this.addToCartButton.click();
+    await this.page.waitForTimeout(1000);
   }
 }
 export { ProductPage };

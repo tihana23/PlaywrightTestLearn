@@ -1,6 +1,6 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { popuUpMessage, scrollFullPage } from "../ReusableMethod/Methods";
 import { HomePage } from "./HomePage";
+import { NavigationBar } from "./NavigationBar";
 export class LoginPage {
   readonly page: Page;
   readonly usernameInput: Locator;
@@ -24,28 +24,6 @@ export class LoginPage {
     this.passwordLabel = page.getByLabel("Log in").getByText("Password:");
   }
 
-  async verifyAllElementsVisibility() {
-    await expect(this.usernameInput).toBeVisible();
-    await expect(this.passwordInput).toBeVisible();
-    await expect(this.loginButton).toBeVisible();
-    await expect(this.closeButton).toBeVisible();
-    await expect(this.loginHeading).toBeVisible();
-    await expect(this.userNameLabel).toBeVisible();
-    await expect(this.passwordLabel).toBeVisible();
-  }
-
-  async closeLoginForm() {
-    await this.closeButton.click();
-  }
-  async closeLoginOnXButton() {
-    await this.closeXButton.click();
-  }
-
-  async verifyThatTextCanBeWrittenInUsernameAndPassword() {
-    await this.usernameInput.fill("username");
-    await this.passwordInput.fill("password");
-  }
-
   async login(username: string, password: string) {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
@@ -53,32 +31,18 @@ export class LoginPage {
     await this.page.waitForTimeout(1000);
   }
 
-  async verifyPopupLoginMessageNonCredentials() {
-    await popuUpMessage(this.page, "Please fill out Username and Password.");
-  }
-
-  async verifyPopupLoginMessageWrongCredentials() {
-    await popuUpMessage(this.page, "User does not exist.");
-  }
   async verifyLoginUser(expectedUsername: string) {
     const welcomeMessageLocator = this.page.locator("a#nameofuser");
     await expect(welcomeMessageLocator).toContainText(
       `Welcome ${expectedUsername}`
     );
   }
-  async loginWithWorngCreds() {
-    const homePage = new HomePage(this.page);
-    await this.verifyPopupLoginMessageWrongCredentials();
-    await homePage.goToHomePage();
-    await homePage.openLoginPopup();
-    await this.login("sdfada", "342424");
-    await this.page.waitForTimeout(1000);
-  }
+
   async logInWithRightCreds() {
     const homePage = new HomePage(this.page);
-    await this.verifyPopupLoginMessageWrongCredentials();
-    await homePage.goToHomePage();
-    await homePage.openLoginPopup();
+    const navigationBar = new NavigationBar(this.page);
+    await homePage.goTo();
+    await navigationBar.navigateToLogin();
     await this.login("tihana", "123456");
     await this.page.waitForTimeout(1000);
   }

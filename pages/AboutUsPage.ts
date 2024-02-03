@@ -2,7 +2,6 @@ import { Page, Locator, expect } from "@playwright/test";
 
 class AboutUsPage {
   readonly page: Page;
-  readonly aboutUsLink: Locator;
   readonly aboutUsTitle: Locator;
   readonly closeButton: Locator;
   readonly closeXButton: Locator;
@@ -19,18 +18,11 @@ class AboutUsPage {
     this.closeXButton = page.locator("#videoModal").getByLabel("Close");
   }
 
-  async verifyThatAboutUsTitleIsVisible() {
-    await expect(this.aboutUsTitle).toBeVisible();
+  async verifyThatAboutUsElementsAreVisible() {
+      await expect(this.aboutUsTitle).toBeVisible();
+      await expect(this.closeButton).toBeVisible();
+      await expect(this.closeXButton).toBeVisible();
   }
 
-  async verifyCloseButtonIsVisible() {
-    await expect(this.closeButton).toBeVisible();
-  }
-  async closeAboutUsForm() {
-    await this.closeButton.click();
-  }
-  async closeAboutUsFormOnXButton() {
-    await this.closeXButton.click();
-  }
 }
 export { AboutUsPage };
