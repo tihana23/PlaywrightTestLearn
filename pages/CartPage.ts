@@ -10,7 +10,6 @@ class CartPage {
   readonly closeButton: Locator;
   readonly totalAmount: Locator;
   readonly placeOrderModalHeader: Locator;
-  readonly productNameLocator: (productName: string) => Locator;
   readonly placeOrderButtonCartPage: Locator;
   readonly placeOrderPopupHeading: Locator;
   readonly placeOrderPopupTotal: Locator;
@@ -49,8 +48,6 @@ class CartPage {
     this.deleteButton = page.getByRole("link", { name: "Delete" });
     this.purchaseButton = page.locator('button:has-text("Place Order")');
     this.totalAmount = page.locator("#totalp");
-    this.productNameLocator = (productName: string) =>
-      page.getByRole("cell", { name: productName });
     this.placeOrderButtonCartPage = page.getByRole("button", {
       name: "Place Order",
     });
@@ -87,39 +84,53 @@ class CartPage {
   }
 
   async verifyVisabilityAllElementsOnPopupPlaceOrderPage() {
-    await expect(this.placeOrderPopupHeading).toBeVisible();
-    await expect(this.placeOrderPopupTotal).toBeVisible();
-    await expect(this.placeOrderPopupLabelName).toBeVisible();
-    await expect(this.placeOrderPopupTextboxName).toBeVisible();
-    await expect(this.placeOrderPopupLabelCountry).toBeVisible();
-    await expect(this.placeOrderPopupTextboxCountry).toBeVisible();
-    await expect(this.placeOrderPopupLabelCity).toBeVisible();
-    await expect(this.placeOrderPopupTextboxCity).toBeVisible();
-    await expect(this.placeOrderPopupLabelMonth).toBeVisible();
-    await expect(this.placeOrderPopupTextboxMonth).toBeVisible();
-    await expect(this.placeOrderPopupLabelYear).toBeVisible();
-    await expect(this.placeOrderPopupTextboxYear).toBeVisible();
-    await expect(this.placeOrderPopupXCloseButton).toBeVisible();
-    await expect(this.placeOrderPopupPurchaseButton).toBeVisible();
-    await expect(this.placeOrderPopupCloseButton).toBeVisible();
+    const elementsToVerifyVisible: Locator[] = [
+      this.placeOrderPopupHeading,
+      this.placeOrderPopupTotal,
+      this.placeOrderPopupLabelName,
+      this.placeOrderPopupTextboxName,
+      this.placeOrderPopupLabelCountry,
+      this.placeOrderPopupTextboxCountry,
+      this.placeOrderPopupLabelCity,
+      this.placeOrderPopupTextboxCity,
+      this.placeOrderPopupLabelCreditCard, // Assuming you want to verify this as well
+      this.placeOrderPopupTextboxCreditCard, // Assuming you want to verify this as well
+      this.placeOrderPopupLabelMonth,
+      this.placeOrderPopupTextboxMonth,
+      this.placeOrderPopupLabelYear,
+      this.placeOrderPopupTextboxYear,
+      this.placeOrderPopupXCloseButton,
+      this.placeOrderPopupPurchaseButton,
+      this.placeOrderPopupCloseButton,
+    ];
+
+    for (const element of elementsToVerifyVisible) {
+      await expect(element).toBeVisible();
+    }
   }
 
   async verifyVisabilityAllElementsInCartPage() {
-    await expect(this.pageTitleCart).toBeVisible();
-    await expect(this.pageTotalCart).toBeVisible();
-    await expect(this.pageProductsGridPicture).toBeVisible();
-    await expect(this.pageProductsGridTitle).toBeVisible();
-    await expect(this.pageProducGridPrice).toBeVisible();
-    await expect(this.pageProducGridX).toBeVisible();
-  }
+    const elementsToVerifyVisible: Locator[] = [
+      this.pageTitleCart,
+      this.pageTotalCart,
+      this.pageProductsGridPicture,
+      this.pageProductsGridTitle,
+      this.pageProducGridPrice,
+      this.pageProducGridX,
+      // Add other locators for elements you wish to verify on the cart page
+    ];
 
+    for (const element of elementsToVerifyVisible) {
+      await expect(element).toBeVisible();
+    }
+  }
   async verifyProductInCart(productName: string) {
-    const productLocator = this.productNameLocator(productName);
+    const productLocator = this.page.getByRole("cell", { name: productName });
     await expect(productLocator).toBeVisible({ timeout: 50000 });
   }
   async verifyIsthereAnyProductInCart(productName: string) {
     await this.page.waitForLoadState("networkidle");
-    const productLocators = this.productNameLocator(productName);
+    const productLocators = this.page.getByRole("cell", { name: productName });
     const count = await productLocators.count();
     expect(count).toBeGreaterThan(0);
   }
@@ -129,7 +140,7 @@ class CartPage {
   }
 
   async verifyProductRemoved(productName: string) {
-    const productLocator = this.productNameLocator(productName);
+    const productLocator = this.page.getByRole("cell", { name: productName });
     await expect(productLocator).toBeHidden();
   }
   async removeProductFromCart(productName: string) {

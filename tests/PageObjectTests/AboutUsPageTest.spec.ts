@@ -11,7 +11,7 @@ test("Verify that AboutUsPopup have all fields visible", async ({ page }) => {
   await aboutUs.verifyThatAboutUsElementsAreVisible();
 });
 
-test("Verify that AboutUsPopup can be close on close buton", async ({
+test("Verify that AboutUsPopup can be close on close button", async ({
   page,
 }) => {
   const homePage = new HomePage(page);

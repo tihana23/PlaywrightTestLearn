@@ -63,6 +63,24 @@ export async function scrollFullPage(page) {
       window.scrollTo(0, i);
     }
   });
+}
 
- 
+export async function addItemToCartAndVerify(
+  page,
+  category: string,
+  itemName: string
+) {
+  const choosedCategory = `text=${category}`;
+  await page.click(choosedCategory);
+  const itemNames = `a:has-text("${itemName}")`;
+  await page.click(itemNames);
+  const visibleItemInProductPage = page.locator(`h2:has-text("${itemName}")`);
+  await expect.soft(visibleItemInProductPage).toBeVisible();
+  const adToCartButon = "text=Add to cart";
+  await page.click(adToCartButon);
+  const cartLink = 'a:has-text("Cart")';
+  await page.click(cartLink);
+  await expect.soft(page).toHaveURL("https://www.demoblaze.com/cart.html");
+  const itemInCarte = page.locator(`:text("${itemName}")`);
+  await expect.soft(itemInCarte).toBeVisible();
 }

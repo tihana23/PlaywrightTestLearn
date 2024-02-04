@@ -1,169 +1,59 @@
 import { faker } from "@faker-js/faker";
-import { test, expect } from "@playwright/test";
+import { test, expect, Browser, chromium, Page } from "@playwright/test";
 import {
   popuUpMessage,
   addProductToCart,
   getPriceFromCart,
+  addItemToCartAndVerify,
 } from "../../ReusableMethod/Methods";
 test("Verify that one item from home page can be selected and visible on the char page", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  const phonesCategory = page.locator("text=Phones");
-  await expect(phonesCategory).toBeVisible();
-  await phonesCategory.click();
-
-  const samsungGalaxyS6Link = page.locator("a.hrefch", {
-    hasText: "Samsung galaxy s6",
-  });
-  await samsungGalaxyS6Link.click();
-  const samsungGalaxyS6Header = page.locator("h2.name", {
-    hasText: "Samsung galaxy s6",
-  });
-
-  await expect(samsungGalaxyS6Header).toBeVisible({ timeout: 30000 });
-
-  await page.getByText("Add to cart").waitFor({ timeout: 30000 });
-  const linkAddCart8 = page.getByText("Add to cart");
-  await linkAddCart8.click({ force: true });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
-  //await page.waitForTimeout(2000);
-  await cartLink.click();
-  //await page.waitForTimeout(2000);
-  await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
-  const tdSamsungGalaxy = page.getByText("Samsung galaxy s6");
-  await expect(tdSamsungGalaxy).toBeVisible({ timeout: 30000 });
+  await addItemToCartAndVerify(page, "CATEGORIES", "Samsung galaxy s6");
 });
 test("Verify that one item from home page can be selected and visible on the char page and deleted", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  const samsungGalaxyS6Link = page.locator("a.hrefch", {
-    hasText: "Samsung galaxy s6",
-  });
-  await samsungGalaxyS6Link.click();
-  const samsungGalaxyS6Header = page.locator("h2.name", {
-    hasText: "Samsung galaxy s6",
-  });
-
-  await expect(samsungGalaxyS6Header).toBeVisible({ timeout: 10000 });
-
-  await page.getByText("Add to cart").waitFor({ timeout: 10000 });
-  const linkAddCart8 = page.getByText("Add to cart");
-  await linkAddCart8.click({ force: true });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
-  await cartLink.click({ timeout: 10000 });
-  await expect(page).toHaveURL("https://www.demoblaze.com/cart.html", {
-    timeout: 10000,
-  });
-  const tdSamsungGalaxy = page.getByText("Samsung galaxy s6");
-  await expect(tdSamsungGalaxy).toBeVisible({ timeout: 20000 });
-  const linkDelete = page.getByText("Delete");
-  await expect(linkDelete).toBeVisible();
-  await linkDelete.click({ timeout: 10000 });
-
-  await expect(tdSamsungGalaxy).toBeHidden({ timeout: 10000 });
+  await addItemToCartAndVerify(page, "CATEGORIES", "Samsung galaxy s6");
+  const deleteButton = "text=Delete";
+  await page.click(deleteButton);
+  const laptopChar = page.getByText("Samsung galaxy s6");
+  await expect(laptopChar).toBeHidden();
 });
 
-test("Verify that one item from home page and Phone categories can be selected and visible on the char page and deleted", async ({
-  page,
-}) => {
+test("Verify that one item from home page and Phone categories can be selected and visible on the char page and deleted", async () => {
+  const browser: Browser = await chromium.launch({ headless: false });
+  const page: Page = await browser.newPage();
+
   await page.goto("https://www.demoblaze.com/");
-  const phonesCategory = page.locator("text=Phones");
-  await expect(phonesCategory).toBeVisible();
-  await phonesCategory.click();
-  const categoryPhone = page.locator("text=Phones");
-  await expect(categoryPhone).toBeVisible();
-  await categoryPhone.click();
-  const samsungGalaxyS6Link = page.locator("a.hrefch", {
-    hasText: "Samsung galaxy s6",
-  });
-  await samsungGalaxyS6Link.waitFor();
-  await samsungGalaxyS6Link.click();
-  const samsungGalaxyS6Header = page.locator("h2.name", {
-    hasText: "Samsung galaxy s6",
-  });
-  await expect(samsungGalaxyS6Header).toBeVisible({ timeout: 10000 });
-
-  await page.getByText("Add to cart").waitFor();
-  const linkAddCart8 = page.getByText("Add to cart");
-  await linkAddCart8.click({ force: true });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
-  await cartLink.click();
-  await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
-  const tdSamsungGalaxy = page.getByText("Samsung galaxy s6");
-  await expect(tdSamsungGalaxy).toBeVisible();
-  const linkDelete = page.getByText("Delete");
-  await expect(linkDelete).toBeVisible();
-  await linkDelete.click({ timeout: 10000 });
-
-  await expect(tdSamsungGalaxy).toBeHidden();
+  await addItemToCartAndVerify(page, "Phones", "Samsung galaxy s6");
+  const deleteButton = "text=Delete";
+  await page.click(deleteButton);
+  const laptopChar = page.getByText("Samsung galaxy s6");
+  await expect(laptopChar).toBeHidden();
 });
 test("Verify that one item from home page and Laptops categories can be selected and visible on the char page and deleted", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-
-  const categoryLaptops = page.locator("text=Laptops");
-  await expect(categoryLaptops).toBeVisible();
-  await categoryLaptops.click({ timeout: 10000 });
-  const laptopLink = page.locator("a.hrefch", {
-    hasText: "Sony vaio i5",
-  });
-  await laptopLink.waitFor();
-  await laptopLink.click();
-  const laptopHeader = page.locator("h2.name", {
-    hasText: "Sony vaio i5",
-  });
-  const isProductTitlePresent = page.locator("h2.name").textContent();
-  await expect(isProductTitlePresent).toBeTruthy;
-  await expect(laptopHeader).toBeVisible();
-  await page.getByText("Add to cart").waitFor();
-  const linkAddCart8 = page.getByText("Add to cart");
-  await linkAddCart8.click({ force: true });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
-  await cartLink.click({ timeout: 2000 });
-  await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
+  await addItemToCartAndVerify(page, "Laptops", "Sony vaio i5");
+  const deleteButton = "text=Delete";
+  await page.click(deleteButton);
   const laptopChar = page.getByText("Sony vaio i5");
-  await laptopChar.waitFor({ timeout: 10000 });
-  await expect(laptopChar).toBeVisible();
-  const linkDelete = page.getByText("Delete");
-  await expect(linkDelete).toBeVisible();
-  await linkDelete.click({ timeout: 3000 });
   await expect(laptopChar).toBeHidden();
 });
+
 test("Verify that one item from home page and Monitors categories can be selected and visible on the char page and deleted", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  const categoryMonitors = page.locator("text=Monitors");
-  await expect(categoryMonitors).toBeVisible({ timeout: 10000 });
-  await categoryMonitors.click({ timeout: 10000 });
-  const monitorLink = page.locator("a.hrefch", {
-    hasText: "Apple monitor 24",
-  });
-  await monitorLink.click();
-  const monitorHeader = page.locator("h2.name", {
-    hasText: "Apple monitor 24",
-  });
-  const isProductTitlePresent = page.locator("h2.name").textContent();
-  await expect(isProductTitlePresent).toBeTruthy;
-  await expect(monitorHeader).toBeVisible({ timeout: 10000 });
-  await page.getByText("Add to cart").waitFor();
-  const linkAddCart8 = page.getByText("Add to cart");
-  await linkAddCart8.click({ force: true });
-  const cartLink = page.locator("a.nav-link", { hasText: "Cart" });
-  await cartLink.click();
-  await expect(page).toHaveURL("https://www.demoblaze.com/cart.html");
-  const monitorChar = page.getByText("Apple monitor 24");
-
-  await expect(monitorChar).toBeVisible({ timeout: 10000 });
-  const linkDelete = page.getByText("Delete");
-
-  await expect(linkDelete).toBeVisible();
-  await linkDelete.click({ timeout: 10000 });
-
-  await expect(monitorChar).toBeHidden();
+  await addItemToCartAndVerify(page, "Monitors", "Apple monitor 24");
+  const deleteButton = "text=Delete";
+  await page.click(deleteButton);
+  const laptopChar = page.getByText("Apple monitor 24");
+  await expect(laptopChar).toBeHidden();
 });
 
 test("Verify total in cart is calculated correctly", async ({ page }) => {
@@ -193,7 +83,7 @@ test("Verify that Place order is working correcly..not so much but...", async ({
   const expectedTotal = priceSamsung + priceNokia;
   const totalText = await page.textContent("#totalp");
   const actualTotal = totalText ? parseFloat(totalText) : 0;
-  expect(expectedTotal).toBe(actualTotal);
+  expect.soft(expectedTotal).toBe(actualTotal);
   const buttonPlaceOrder = page.locator('button:has-text("Place Order")');
   await buttonPlaceOrder.click();
   const placeOrderNameTextbox = page.locator("#name");

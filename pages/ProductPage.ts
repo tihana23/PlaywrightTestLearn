@@ -1,31 +1,40 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { popuUpMessage } from "../ReusableMethod/Methods";
+
 class ProductPage {
   readonly page: Page;
-  readonly productLink: (productName: string) => Locator;
-  readonly productHeading: (productName: string) => Locator;
+  productName: string;
+  private _productLink: Locator; // Now a static locator, initialized in the constructor
+  private _productHeading: Locator;
   readonly addToCartButton: Locator;
   readonly cartLink: Locator;
   readonly productImage: Locator;
   readonly productDescription: Locator;
 
-  constructor(page: Page) {
+  constructor(page: Page, productName: string) {
     this.page = page;
-    this.productHeading = (productName: string) =>
-      page.getByRole("heading", { name: productName });
+    this.productName = productName;
+    // Initialize the product link and heading locators based on the provided product name
+    this._productLink = page.locator(`a:has-text("${productName}")`);
+    this._productHeading = page.getByRole("heading", { name: productName });
     this.addToCartButton = page.getByRole("link", { name: "Add to cart" });
     this.cartLink = page.getByRole("link", { name: "Cart", exact: true });
     this.productImage = page.locator("#imgp img");
     this.productDescription = page.getByText("Product description");
   }
 
-  async verifyProductIsOpenAndAllFielsAreVisible(productName: string) {
-    await expect(this.productHeading(productName)).toBeVisible();
-    await expect(this.productImage).toBeVisible();
-    await expect(this.productDescription).toBeVisible();
-    await expect(this.addToCartButton).toBeVisible();
+  async verifyProductIsOpenAndAllFieldsAreVisible() {
+    const elements: Locator[] = [
+      this._productHeading,
+      this.productImage,
+      this.productDescription,
+      this.addToCartButton,
+    ];
+
+    for (const element of elements) {
+      await expect(element).toBeVisible();
+    }
   }
- 
+
   async addProductToCart() {
     await this.addToCartButton.click();
     await this.page.waitForTimeout(1000);

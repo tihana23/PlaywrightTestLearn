@@ -1,7 +1,6 @@
 import { Page, Locator, expect } from "@playwright/test";
 import { popuUpMessage } from "../ReusableMethod/Methods";
 
-
 class RegisterPage {
   readonly page: Page;
   readonly registerHeading: Locator;
@@ -24,17 +23,22 @@ class RegisterPage {
     this.closeXButton = page.getByLabel("Sign up").getByText("Close");
     this.closeButton = page.getByLabel("Sign up").getByLabel("Close");
   }
-
   async verifyThatAllElementsAreVisibleOnRegisterPage() {
-    await expect(this.usernameInput).toBeVisible();
-    await expect(this.passwordInput).toBeVisible();
-    await expect(this.signUpButton).toBeVisible();
-    await expect(this.closeButton).toBeVisible();
-    await expect(this.registerHeading).toBeVisible();
-    await expect(this.userNameLabel).toBeVisible();
-    await expect(this.passwordLabel).toBeVisible();
-  }
+    const elements: Locator[] = [
+      this.usernameInput,
+      this.passwordInput,
+      this.signUpButton,
+      this.closeButton,
+      this.registerHeading,
+      this.userNameLabel,
+      this.passwordLabel,
+      this.closeXButton,
+    ];
 
+    for (const element of elements) {
+      await expect(element).toBeVisible();
+    }
+  }
   async fillSignUpForm(username: string, password: string) {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);

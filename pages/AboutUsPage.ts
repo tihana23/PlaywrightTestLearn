@@ -19,10 +19,10 @@ class AboutUsPage {
   }
 
   async verifyThatAboutUsElementsAreVisible() {
-      await expect(this.aboutUsTitle).toBeVisible();
-      await expect(this.closeButton).toBeVisible();
-      await expect(this.closeXButton).toBeVisible();
+    const elements = [this.aboutUsTitle, this.closeButton, this.closeXButton];
+    for (const element of elements) {
+      await expect(element).toBeVisible();
+    }
   }
-
 }
 export { AboutUsPage };

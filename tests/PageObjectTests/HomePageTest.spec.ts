@@ -52,7 +52,7 @@ test("Verify that one from Home Page item can be clicked and visible on the Char
 }) => {
   const homePage = new HomePage(page);
   const cartPage = new CartPage(page);
-  const productPage = new ProductPage(page);
+  const productPage = new ProductPage(page,"Nokia lumia 1520");
   const navigationBar = new NavigationBar(page);
   await homePage.goTo();
   await homePage.selectProduct("Nokia lumia 1520");
@@ -65,15 +65,13 @@ test("Verify that one item from Home page and Phone categories is visible and ca
   page,
 }) => {
   const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+  const productPage = new ProductPage(page, "Samsung galaxy s6");
   const cartPage = new CartPage(page);
   const navigationBar = new NavigationBar(page);
   await homePage.goTo();
   await homePage.navigateToPhonesCategory();
   await homePage.selectProduct("Samsung galaxy s6");
-  await productPage.verifyProductIsOpenAndAllFielsAreVisible(
-    "Samsung galaxy s6"
-  );
+  await productPage.verifyProductIsOpenAndAllFieldsAreVisible();
   await productPage.addProductToCart();
   await navigationBar.navigateToCart();
   await cartPage.verifyProductInCart("Samsung galaxy s6");
@@ -82,14 +80,14 @@ test("Verify that one item from home page and Laptops categories is visible and 
   page,
 }) => {
   const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+  const productPage = new ProductPage(page, "MacBook air");
   const cartPage = new CartPage(page);
   const navigationBar = new NavigationBar(page);
 
   await homePage.goTo();
   await homePage.navigateToLaptopsCategory();
   await homePage.selectProduct("MacBook air");
-  await productPage.verifyProductIsOpenAndAllFielsAreVisible("MacBook air");
+  await productPage.verifyProductIsOpenAndAllFieldsAreVisible();
   await productPage.addProductToCart();
   await navigationBar.navigateToCart();
   await cartPage.verifyProductInCart("MacBook air");
@@ -98,16 +96,14 @@ test("Verify that one item from home page and Monitors categories is visible and
   page,
 }) => {
   const homePage = new HomePage(page);
-  const productPage = new ProductPage(page);
+  const productPage = new ProductPage(page, "Apple monitor 24");
   const cartPage = new CartPage(page);
   const navigationBar = new NavigationBar(page);
 
   await homePage.goTo();
   await homePage.navigateToMonitorsCategory();
   await homePage.selectProduct("Apple monitor 24");
-  await productPage.verifyProductIsOpenAndAllFielsAreVisible(
-    "Apple monitor 24"
-  );
+  await productPage.verifyProductIsOpenAndAllFieldsAreVisible();
   await productPage.addProductToCart();
   await navigationBar.navigateToCart();
   await cartPage.verifyProductInCart("Apple monitor 24");

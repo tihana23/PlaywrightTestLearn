@@ -21,6 +21,20 @@ class NavigationBar {
     this.signUpLink = page.getByRole("link", { name: "Sign up" });
     this.logoutLink = page.locator("#logout2");
   }
+  private linkByName(name: string) {
+    return this.page.getByRole("link", { name });
+  }
+  async navigateTo(linkName: string) {
+    const link = this.linkByName(linkName);
+    await expect(link).toBeVisible(); 
+  }
+
+  async verifyAllNavBarLinksAreVisible() {
+    const links = ["Home", "Contact", "About us", "Cart", "Log in", "Sign up"];
+    for (const linkName of links) {
+      await expect(this.linkByName(linkName)).toBeVisible();
+    }
+  }
 
   async navigateToHome() {
     await this.homeLink.click();
@@ -50,13 +64,6 @@ class NavigationBar {
     await expect(this.loginLink).toBeVisible();
   }
 
-  async verifyAllNavBarLinksAreVisible() {
-    await expect(this.homeLink).toBeVisible();
-    await expect(this.aboutUsLink).toBeVisible();
-    await expect(this.aboutUsLink).toBeVisible();
-    await expect(this.cartLink).toBeVisible();
-    await expect(this.loginLink).toBeVisible();
-    await expect(this.signUpLink).toBeVisible();
-  }
+
 }
 export { NavigationBar };
