@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { test, expect, Browser, chromium, Page } from "@playwright/test";
+import { test, expect} from "@playwright/test";
 import {
   popuUpMessage,
   addProductToCart,
@@ -23,9 +23,8 @@ test("Verify that one item from home page can be selected and visible on the cha
   await expect(laptopChar).toBeHidden();
 });
 
-test("Verify that one item from home page and Phone categories can be selected and visible on the char page and deleted", async () => {
-  const browser: Browser = await chromium.launch({ headless: false });
-  const page: Page = await browser.newPage();
+test("Verify that one item from home page and Phone categories can be selected and visible on the char page and deleted", async ({page}) => {
+  
 
   await page.goto("https://www.demoblaze.com/");
   await addItemToCartAndVerify(page, "Phones", "Samsung galaxy s6");
@@ -169,4 +168,4 @@ test("Verify that Close button inside place order working and Place order window
   ).not.toBeVisible();
 });
 
-//! napraviti jos jedan tc Login usera stavi u cart item logout i provjera dali je item u cartu
+

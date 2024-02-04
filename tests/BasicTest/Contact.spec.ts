@@ -1,8 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { test, expect } from "@playwright/test";
 import { popuUpMessage } from "../../ReusableMethod/Methods";
-const username = faker.person.firstName();
-const password = faker.person.lastName();
+
 
 test("Verify that contact form has all correct labels", async ({ page }) => {
   await page.goto("https://www.demoblaze.com/");

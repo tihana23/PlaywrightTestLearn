@@ -1,5 +1,5 @@
-import { faker } from "@faker-js/faker";
-import { test, expect, Browser, chromium, Page } from "@playwright/test";
+
+import { test, expect } from "@playwright/test";
 import { popuUpMessage } from "../../ReusableMethod/Methods";
 
 test("Verify on login page all required boxes are visible", async ({
