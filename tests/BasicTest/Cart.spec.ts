@@ -1,33 +1,41 @@
 import { faker } from "@faker-js/faker";
-import { test, expect} from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import {
   popuUpMessage,
   addProductToCart,
   getPriceFromCart,
-  addItemToCartAndVerify,
+  addItemToCartWithCategoryAndVerify,
 } from "../../ReusableMethod/Methods";
 test("Verify that one item from home page can be selected and visible on the char page", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  await addItemToCartAndVerify(page, "CATEGORIES", "Samsung galaxy s6");
+  await addItemToCartWithCategoryAndVerify(
+    page,
+    "CATEGORIES",
+    "Samsung galaxy s6"
+  );
 });
 test("Verify that one item from home page can be selected and visible on the char page and deleted", async ({
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  await addItemToCartAndVerify(page, "CATEGORIES", "Samsung galaxy s6");
+  await addItemToCartWithCategoryAndVerify(
+    page,
+    "CATEGORIES",
+    "Samsung galaxy s6"
+  );
   const deleteButton = "text=Delete";
   await page.click(deleteButton);
   const laptopChar = page.getByText("Samsung galaxy s6");
   await expect(laptopChar).toBeHidden();
 });
 
-test("Verify that one item from home page and Phone categories can be selected and visible on the char page and deleted", async ({page}) => {
-  
-
+test("Verify that one item from home page and Phone categories can be selected and visible on the char page and deleted", async ({
+  page,
+}) => {
   await page.goto("https://www.demoblaze.com/");
-  await addItemToCartAndVerify(page, "Phones", "Samsung galaxy s6");
+  await addItemToCartWithCategoryAndVerify(page, "Phones", "Samsung galaxy s6");
   const deleteButton = "text=Delete";
   await page.click(deleteButton);
   const laptopChar = page.getByText("Samsung galaxy s6");
@@ -37,7 +45,7 @@ test("Verify that one item from home page and Laptops categories can be selected
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  await addItemToCartAndVerify(page, "Laptops", "Sony vaio i5");
+  await addItemToCartWithCategoryAndVerify(page, "Laptops", "Sony vaio i5");
   const deleteButton = "text=Delete";
   await page.click(deleteButton);
   const laptopChar = page.getByText("Sony vaio i5");
@@ -48,7 +56,11 @@ test("Verify that one item from home page and Monitors categories can be selecte
   page,
 }) => {
   await page.goto("https://www.demoblaze.com/");
-  await addItemToCartAndVerify(page, "Monitors", "Apple monitor 24");
+  await addItemToCartWithCategoryAndVerify(
+    page,
+    "Monitors",
+    "Apple monitor 24"
+  );
   const deleteButton = "text=Delete";
   await page.click(deleteButton);
   const laptopChar = page.getByText("Apple monitor 24");
@@ -167,5 +179,3 @@ test("Verify that Close button inside place order working and Place order window
     page.locator('div.modal-header:has-text("Place order")')
   ).not.toBeVisible();
 });
-
-

@@ -65,7 +65,7 @@ export async function scrollFullPage(page) {
   });
 }
 
-export async function addItemToCartAndVerify(
+export async function addItemToCartWithCategoryAndVerify(
   page,
   category: string,
   itemName: string
