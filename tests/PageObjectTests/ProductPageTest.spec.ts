@@ -27,5 +27,5 @@ test("Verify that Add to cart button is working and show popup message", async (
   await popuUpMessage(page, "Product added");
  await productPage.addProductToCart();
   await navigationBar.navigateToCart();
-  await cartPage.verifyProductInCart("Samsung galaxy s6"););
+  await cartPage.verifyProductInCart("Samsung galaxy s6");
 });
