@@ -4,7 +4,7 @@ import { ContactPage } from "../pages/ContactPage";
 import { HomePage } from "../pages/HomePage";
 import { AboutUsPage } from "../pages/AboutUsPage";
 
-export async function popuUpMessage(page: Page, expectedMessage: string) {
+export async function popuUpMessage(page, expectedMessage: string) {
   page.once("dialog", async (dialog: Dialog) => {
     const text = dialog.message();
     expect(text).toBe(expectedMessage);
