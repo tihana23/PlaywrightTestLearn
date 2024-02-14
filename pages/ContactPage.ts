@@ -1,4 +1,4 @@
-import { Page, Locator, expect } from "@playwright/test";
+import { Page, Locator } from "@playwright/test";
 
 export class ContactPage {
   readonly page: Page;
@@ -13,6 +13,8 @@ export class ContactPage {
   readonly contactMessageTextareaLabel: Locator;
   readonly contactCloseXButton: Locator;
   readonly contactCloseButton: Locator;
+  readonly contactsLink: Locator;
+   lastDialogMessage: string;
 
   constructor(page: Page) {
     this.page = page;
@@ -30,14 +32,26 @@ export class ContactPage {
       .getByLabel("New message")
       .getByLabel("Close");
     this.contactCloseButton = page.getByLabel("New message").getByText("Close");
+
+    this.contactsLink = page.getByRole("link", { name: "Contact" });
+  }
+  async goTo() {
+    await this.contactsLink.click();
   }
 
-  
   async fillContactForm(email: string, name: string, message: string) {
     await this.contactEmailInput.fill(email);
     await this.contactNameInput.fill(name);
     await this.contactMessageTextarea.fill(message);
   }
-
-  
+  async setupDialogHandler() {
+    this.page.on("dialog", async (dialog) => {
+      this.lastDialogMessage = dialog.message();
+      await dialog.accept();
+    });
+  }
+  getDialogMessage(): string {
+    return this.lastDialogMessage;
+  }
 }
+

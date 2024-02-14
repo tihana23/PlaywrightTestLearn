@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { popuUpMessage } from "../ReusableMethod/Methods";
+
 
 class RegisterPage {
   readonly page: Page;
@@ -11,6 +11,8 @@ class RegisterPage {
   readonly signUpButton: Locator;
   readonly closeXButton: Locator;
   readonly closeButton: Locator;
+  readonly signUpLink: Locator;
+  private lastDialogMessage: string;
 
   constructor(page: Page) {
     this.page = page;
@@ -22,34 +24,27 @@ class RegisterPage {
     this.signUpButton = page.locator("button[onclick='register()']");
     this.closeXButton = page.getByLabel("Sign up").getByText("Close");
     this.closeButton = page.getByLabel("Sign up").getByLabel("Close");
+    this.signUpLink = page.getByRole("link", { name: "Sign up" });
   }
-  async verifyThatAllElementsAreVisibleOnRegisterPage() {
-    const elements: Locator[] = [
-      this.usernameInput,
-      this.passwordInput,
-      this.signUpButton,
-      this.closeButton,
-      this.registerHeading,
-      this.userNameLabel,
-      this.passwordLabel,
-      this.closeXButton,
-    ];
+  async goTo() {
+    await this.signUpLink.click();
+  }
 
-    for (const element of elements) {
-      await expect(element).toBeVisible();
-    }
-  }
   async fillSignUpForm(username: string, password: string) {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
   }
-
-  async registerNewUser(username: string, password: string) {
-    await popuUpMessage(this.page, "Sign up successful.");
-
-    await this.fillSignUpForm(username, password);
-    await this.signUpButton.click();
-    await this.page.waitForTimeout(1000);
+  async waitForTimeout(duration: number) {
+    await this.page.waitForTimeout(duration);
+  }
+  async setupDialogHandler() {
+    this.page.on("dialog", async (dialog) => {
+      this.lastDialogMessage = dialog.message();
+      await dialog.accept();
+    });
+  }
+  getDialogMessage(): string {
+    return this.lastDialogMessage;
   }
 }
 export { RegisterPage };

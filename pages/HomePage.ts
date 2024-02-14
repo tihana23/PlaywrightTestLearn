@@ -1,8 +1,6 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { verifyNextAndPreviousButton } from "../ReusableMethod/Methods";
-import { CartPage } from "./CartPage";
-import { ProductPage } from "./ProductPage";
-import { NavigationBar } from "./NavigationBar";
+
+
 
 class HomePage {
   readonly page: Page;
@@ -19,7 +17,15 @@ class HomePage {
   readonly productLinks: Locator;
   readonly closeButtonInPopup: Locator;
 
-  productTitles: Locator;
+  readonly productTitles: Locator;
+  readonly homeLink: Locator;
+  //products
+  readonly productNokia: Locator;
+  readonly productSamsungS6: Locator;
+  readonly productAppleMonitor: Locator;
+  readonly productMcBookAir: Locator;
+  readonly productSamsungS7: Locator;
+  readonly someImageOnSlide: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,12 +42,34 @@ class HomePage {
     this.categoriesGrid = page.locator("div.some-grid-or-class-name");
     this.productLinks = page.locator("a.hrefch");
     this.closeButtonInPopup = page.locator(".modal-footer >> text=Close");
+    this.homeLink = page.getByRole("link", { name: "Home" });
+    this.productNokia = page.locator(`a.hrefch`, {
+      hasText: "Nokia lumia 1520",
+    });
+    this.productSamsungS6 = page.locator(`a.hrefch`, {
+      hasText: "Samsung galaxy s6",
+    });
+    this.productAppleMonitor = page.locator(`a.hrefch`, {
+      hasText: "Apple monitor 24",
+    });
+    this.productMcBookAir = page.locator(`a.hrefch`, {
+      hasText: "MacBook air",
+    });
+    this.productSamsungS7 = page.locator(`a.hrefch`, {
+      hasText: "Samsung galaxy s7",
+    });
+
+    this.someImageOnSlide = page.locator('.carousel img[src$=".jpg"]');
   }
 
   async goTo() {
     await this.page.goto("https://www.demoblaze.com/", {
       waitUntil: "networkidle",
     });
+  }
+
+  async goToHomeNav() {
+    await this.homeLink.click();
   }
   async verifyCurrentURL(expectedURL: string) {
     await expect(this.page).toHaveURL(expectedURL);
@@ -51,27 +79,27 @@ class HomePage {
     await expect(this.page).toHaveTitle(expectedText);
   }
 
-  async navigateToPhonesCategory() {
-    await expect(this.phonesCategory).toBeVisible();
-    await this.phonesCategory.click({ timeout: 15000 });
-  }
 
-  async navigateToLaptopsCategory() {
-    await expect(this.laptopsCategory).toBeVisible();
-    await this.laptopsCategory.click({ timeout: 15000 });
-  }
+ async  verifyNextAndPreviousButton(
+  page: Page,
+  buttonSelector: Locator,
+  expectedSlides: Array<{ src: string; alt: string }>
+): Promise<void> {
+  for (const { src, alt } of expectedSlides) {
+    const activeImageSelector =
+      "div.carousel-item.active img.d-block.img-fluid";
+    const image = page.locator(activeImageSelector);
 
-  async navigateToMonitorsCategory() {
-    await expect(this.monitorsCategory).toBeVisible();
-    await this.monitorsCategory.click({ timeout: 15000 });
-    await this.page.waitForTimeout(1000);
-  }
+    await expect(image).toHaveAttribute("src", src);
+    await expect(image).toHaveAttribute("alt", alt);
+    // console.log(`Slide Source: ${src}, Alt Text: ${alt}`);
 
-
-  async selectProduct(productName: string) {
-    const link = this.page.locator(`a.hrefch`, { hasText: productName });
-    await link.click();
+    // Click the button to move to the next/previous slide
+    await buttonSelector.click();
+    // Adjust timeout as needed for slide transition
+    await page.waitForTimeout(1000);
   }
+}
 
   async verifyNextButton() {
     const expectedSlides = [
@@ -80,7 +108,7 @@ class HomePage {
       { src: "iphone1.jpg", alt: "Third slide" },
     ];
 
-    await verifyNextAndPreviousButton(
+    await this.verifyNextAndPreviousButton(
       this.page,
       this.nextButton,
       expectedSlides
@@ -92,44 +120,27 @@ class HomePage {
       { src: "iphone1.jpg", alt: "Third slide" },
       { src: "nexus1.jpg", alt: "Second slide" },
     ];
-    await verifyNextAndPreviousButton(
+    await this.verifyNextAndPreviousButton(
       this.page,
       this.previousButton,
       expectedSlides
     );
   }
 
-  async waitForProduct(productName: string) {
-    const link = this.page.locator(`a.hrefch`, { hasText: productName });
-    await link.waitFor();
-  }
+  async verifyNextButton1() {
+    const images = this.page.locator('.carousel img[src$=".jpg"]');
+    const count = await images.count();
 
+    for (let i = 0; i < count; i++) {
+      await expect(images.nth(i)).toBeVisible();
+      await this.nextButton1.click();
+    }
+  }
   async getProductTitles() {
     await this.productTitles.first().waitFor();
     return this.page.$$eval(".card-title a", (elements) =>
       elements.map((e) => (e.textContent ? e.textContent.trim() : ""))
     );
-  }
-
-  //connectedMethods
-  async selectOneItemFromPageAndAddItToCart(productName: string) {
-    const cartPage = new CartPage(this.page);
-    const productPage = new ProductPage(this.page, productName);
-    const navigationBar = new NavigationBar(this.page);
-    await this.goTo();
-    await this.selectProduct(productName);
-    await productPage.addProductToCart();
-    await navigationBar.navigateToCart();
-    await cartPage.verifyProductInCart(productName);
-  }
-  async selectOneItemFromCategoriesAndAddItToCart(productName: string) {
-    const cartPage = new CartPage(this.page);
-    const productPage = new ProductPage(this.page, productName);
-    const navigationBar = new NavigationBar(this.page);
-    await this.selectProduct(productName);
-    await productPage.addProductToCart();
-    await navigationBar.navigateToCart();
-    await cartPage.verifyProductInCart(productName);
   }
 }
 

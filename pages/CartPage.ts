@@ -1,5 +1,4 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { popuUpMessage } from "../ReusableMethod/Methods";
 import { faker } from "@faker-js/faker";
 
 class CartPage {
@@ -36,6 +35,14 @@ class CartPage {
   readonly thankYouMessageLocator: Locator;
   readonly popupAmount: Locator;
   readonly popupName: Locator;
+  readonly cartLink: Locator;
+  readonly cartNokia: Locator;
+  readonly cartSamsungS6: Locator;
+  readonly cartMcBookAir: Locator;
+  readonly cartAppleMonitor: Locator;
+  readonly productRowCartSamsung: Locator;
+  readonly productRowCartNokia: Locator;
+  private lastDialogMessage: string;
 
   constructor(page: Page) {
     this.page = page;
@@ -81,73 +88,42 @@ class CartPage {
     );
     this.popupAmount = page.locator("p.lead.text-muted");
     this.popupName = page.locator("p.lead.text-muted >> text=/Name: .+/");
-  }
 
-  async verifyVisabilityAllElementsOnPopupPlaceOrderPage() {
-    const elementsToVerifyVisible: Locator[] = [
-      this.placeOrderPopupHeading,
-      this.placeOrderPopupTotal,
-      this.placeOrderPopupLabelName,
-      this.placeOrderPopupTextboxName,
-      this.placeOrderPopupLabelCountry,
-      this.placeOrderPopupTextboxCountry,
-      this.placeOrderPopupLabelCity,
-      this.placeOrderPopupTextboxCity,
-      this.placeOrderPopupLabelCreditCard, // Assuming you want to verify this as well
-      this.placeOrderPopupTextboxCreditCard, // Assuming you want to verify this as well
-      this.placeOrderPopupLabelMonth,
-      this.placeOrderPopupTextboxMonth,
-      this.placeOrderPopupLabelYear,
-      this.placeOrderPopupTextboxYear,
-      this.placeOrderPopupXCloseButton,
-      this.placeOrderPopupPurchaseButton,
-      this.placeOrderPopupCloseButton,
-    ];
+    this.cartLink = page.getByRole("link", { name: "Cart", exact: true });
+    this.cartNokia = page
+      .getByRole("cell", { name: "Nokia lumia 1520" })
+      .first();
+    this.cartSamsungS6 = page
+      .getByRole("cell", { name: "Samsung galaxy s6" })
+      .first();
+    this.cartMcBookAir = page
+      .getByRole("cell", { name: "MacBook air" })
+      .first();
+    this.cartAppleMonitor = page
+      .getByRole("cell", {
+        name: "Apple monitor 24",
+      })
+      .first();
 
-    for (const element of elementsToVerifyVisible) {
-      await expect(element).toBeVisible();
-    }
+    this.productRowCartSamsung = page.locator(
+      'tr.success:has-text("Samsung galaxy s6")'
+    );
+    this.productRowCartNokia = page.locator(
+      'tr.success:has-text("Nokia lumia 1520")'
+    );
   }
-
-  async verifyVisabilityAllElementsInCartPage() {
-    const elementsToVerifyVisible: Locator[] = [
-      this.pageTitleCart,
-      this.pageTotalCart,
-      this.pageProductsGridPicture,
-      this.pageProductsGridTitle,
-      this.pageProducGridPrice,
-      this.pageProducGridX,
-      // Add other locators for elements you wish to verify on the cart page
-    ];
-
-    for (const element of elementsToVerifyVisible) {
-      await expect(element).toBeVisible();
-    }
+  async goTo() {
+    await this.cartLink.click();
   }
-  async verifyProductInCart(productName: string) {
-    const productLocator = this.page.getByRole("cell", { name: productName });
-    await expect(productLocator).toBeVisible({ timeout: 50000 });
+  async waitForPopupMessage(popupMessage: string) {
+    const popupMessageSelector = `text="${popupMessage}"`;
+    await this.page.waitForSelector(popupMessageSelector, {
+      state: "visible",
+    });
   }
-  async verifyIsthereAnyProductInCart(productName: string) {
-    await this.page.waitForLoadState("networkidle");
-    const productLocators = this.page.getByRole("cell", { name: productName });
-    const count = await productLocators.count();
-    expect(count).toBeGreaterThan(0);
+  public get currentPage() {
+    return this.page;
   }
-
-  async verifyDialogPopupLoginMessageWrongCredentials() {
-    await popuUpMessage(this.page, "Please fill out Name and Creditcard.");
-  }
-
-  async verifyProductRemoved(productName: string) {
-    const productLocator = this.page.getByRole("cell", { name: productName });
-    await expect(productLocator).toBeHidden();
-  }
-  async removeProductFromCart(productName: string) {
-    await this.deleteButton.click();
-    await this.verifyProductRemoved(productName);
-  }
-
   async verifyTotalAmount(expectedTotal: number) {
     const totalText = await this.totalAmount.textContent();
     const actualTotal = totalText ? parseFloat(totalText) : 0;
@@ -195,8 +171,28 @@ class CartPage {
     const nameFromPopup =
       (await this.getTextContent(this.popupName, /Name: (.+?)(?=Date)/)) || "";
 
-    expect(expectedTotal).toBe(amountFromPopup);
-    expect(nameFromPopup).toBe(orderData.name);
+    await expect(expectedTotal).toBe(amountFromPopup);
+    await expect(nameFromPopup).toBe(orderData.name);
+  }
+
+  async getPriceFromCart(productRow: Locator): Promise<number> {
+    const priceText = await productRow.locator("td:nth-child(3)").textContent();
+    if (priceText !== null) {
+      return parseFloat(priceText);
+    } else {
+      console.error(`Price not found for the specified product`);
+      return 0;
+    }
+  }
+  async setupDialogHandler() {
+    this.page.on("dialog", async (dialog) => {
+      this.lastDialogMessage = dialog.message();
+      await dialog.accept(); 
+    });
+  }
+  getDialogMessage(): string {
+    return this.lastDialogMessage;
   }
 }
+
 export { CartPage };

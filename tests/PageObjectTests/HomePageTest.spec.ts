@@ -1,137 +1,127 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../../pages/HomePage";
-import { CartPage } from "../../pages/CartPage";
-import { ProductPage } from "../../pages/ProductPage";
-import { NavigationBar } from "../../pages/NavigationBar";
-test("Verify that webpage has title", async ({ page }) => {
-  const homePage = new HomePage(page);
+import { test, expect } from "../fixtures/basePage";
+test("Verify that webpage has title", async ({ homePage }) => {
   await homePage.goTo();
   await homePage.verifyCurrentURL("https://www.demoblaze.com/");
   await homePage.verifyWebPageTitle("STORE");
 });
-test("Verify that homepage load test", async ({ page }) => {
-  const homePage = new HomePage(page);
+test("Verify that homepage load test", async ({ homePage }) => {
   await homePage.goTo();
   await expect(homePage.homePageElement).toBeVisible();
 });
 test("Verify that next button on headline mobile pictures is working as expected", async ({
-  page,
+  homePage,
 }) => {
-  const homePage = new HomePage(page);
   await homePage.goTo();
 
   await homePage.verifyNextButton();
 });
 test("Verify that Previous button on headline mobile pictures is working as expected", async ({
-  page,
+  homePage,
 }) => {
-  const homePage = new HomePage(page);
   await homePage.goTo();
   await homePage.verifyPreviousButton();
 });
 
-test("Verify that categories text is displyed", async ({ page }) => {
-  const homePage = new HomePage(page);
+test("Verify that categories text is displyed", async ({ homePage }) => {
   await homePage.goTo();
   await expect(homePage.categoriesHeadline).toBeVisible();
 });
 
 test("Verify that Phone Laptop Minitors categories are displayed", async ({
-  page,
+  homePage,
 }) => {
-  await page.goto("https://www.demoblaze.com/", { waitUntil: "networkidle" });
-  const homePage = new HomePage(page);
   await homePage.goTo();
-  await homePage.navigateToPhonesCategory();
-  await homePage.navigateToLaptopsCategory();
-  await homePage.navigateToMonitorsCategory();
+  await expect.soft(homePage.phonesCategory).toBeVisible();
+  await expect.soft(homePage.laptopsCategory).toBeVisible();
+  await expect(homePage.monitorsCategory).toBeVisible();
 });
 
 test("Verify that one from Home Page item can be clicked and visible on the Char page", async ({
-  page,
+  homePage,
+  cartPage,
+  productPage,
 }) => {
-  const homePage = new HomePage(page);
-  const cartPage = new CartPage(page);
-  const productPage = new ProductPage(page,"Nokia lumia 1520");
-  const navigationBar = new NavigationBar(page);
   await homePage.goTo();
-  await homePage.selectProduct("Nokia lumia 1520");
-  await productPage.addProductToCart();
-  await navigationBar.navigateToCart();
-  await cartPage.verifyProductInCart("Nokia lumia 1520");
+  await homePage.productNokia.click();
+  await productPage.addToCartButton.click();
+
+  await cartPage.goTo();
+  await expect(cartPage.cartNokia).toBeVisible({ timeout: 50000 });
 });
 
 test("Verify that one item from Home page and Phone categories is visible and can be selected", async ({
-  page,
+  homePage,
+  cartPage,
+  productPage,
 }) => {
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page, "Samsung galaxy s6");
-  const cartPage = new CartPage(page);
-  const navigationBar = new NavigationBar(page);
   await homePage.goTo();
-  await homePage.navigateToPhonesCategory();
-  await homePage.selectProduct("Samsung galaxy s6");
-  await productPage.verifyProductIsOpenAndAllFieldsAreVisible();
-  await productPage.addProductToCart();
-  await navigationBar.navigateToCart();
-  await cartPage.verifyProductInCart("Samsung galaxy s6");
+  await homePage.phonesCategory.click();
+  await homePage.productSamsungS6.click();
+  await expect.soft(productPage.productHeadingSamsungS6).toBeVisible();
+  await expect.soft(productPage.productImage).toBeVisible();
+  await expect.soft(productPage.productDescription).toBeVisible();
+  await expect.soft(productPage.addToCartButton).toBeVisible();
+  await productPage.addToCartButton.click();
+  await cartPage.goTo();
+  await expect(cartPage.cartSamsungS6).toBeVisible({ timeout: 50000 });
 });
 test("Verify that one item from home page and Laptops categories is visible and can be selected", async ({
-  page,
+  homePage,
+  cartPage,
+  productPage,
 }) => {
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page, "MacBook air");
-  const cartPage = new CartPage(page);
-  const navigationBar = new NavigationBar(page);
-
   await homePage.goTo();
-  await homePage.navigateToLaptopsCategory();
-  await homePage.selectProduct("MacBook air");
-  await productPage.verifyProductIsOpenAndAllFieldsAreVisible();
-  await productPage.addProductToCart();
-  await navigationBar.navigateToCart();
-  await cartPage.verifyProductInCart("MacBook air");
+  await homePage.laptopsCategory.click();
+  await expect.soft(homePage.productMcBookAir).toBeEnabled;
+  await homePage.productMcBookAir.click();
+  await expect.soft(productPage.productHeadingMcBookAir).toBeVisible();
+  await expect.soft(productPage.productImage).toBeVisible();
+  await expect.soft(productPage.productDescription).toBeVisible();
+  await expect.soft(productPage.addToCartButton).toBeVisible();
+  await productPage.addToCartButton.click();
+  await cartPage.goTo();
+  await expect(cartPage.cartMcBookAir).toBeVisible({ timeout: 50000 });
 });
 test("Verify that one item from home page and Monitors categories is visible and can be selected", async ({
-  page,
+  homePage,
+  cartPage,
+  productPage,
 }) => {
-  const homePage = new HomePage(page);
-  const productPage = new ProductPage(page, "Apple monitor 24");
-  const cartPage = new CartPage(page);
-  const navigationBar = new NavigationBar(page);
-
   await homePage.goTo();
-  await homePage.navigateToMonitorsCategory();
-  await homePage.selectProduct("Apple monitor 24");
-  await productPage.verifyProductIsOpenAndAllFieldsAreVisible();
-  await productPage.addProductToCart();
-  await navigationBar.navigateToCart();
-  await cartPage.verifyProductInCart("Apple monitor 24");
+  await homePage.monitorsCategory.click();
+  await expect.soft(homePage.productAppleMonitor).toBeEnabled;
+   await homePage.productAppleMonitor.click();
+  await expect.soft(productPage.productHeadingAppleMonitor).toBeVisible();
+  await expect.soft(productPage.productImage).toBeVisible();
+  await expect.soft(productPage.productDescription).toBeVisible();
+  await expect.soft(productPage.addToCartButton).toBeVisible();
+  await productPage.addToCartButton.click();
+  await cartPage.goTo();
+  await expect(cartPage.cartAppleMonitor).toBeVisible({ timeout: 50000 });
 });
 
 test("Verify that Categories gird is working as excepted on Next and previous button", async ({
-  page,
+  homePage,
 }) => {
-  const homePage = new HomePage(page);
   await homePage.goTo();
 
-  await homePage.waitForProduct("Samsung galaxy s6");
+  await expect.soft(homePage.productSamsungS6).toBeVisible();
   let firstPageItems = await homePage.getProductTitles();
 
   await homePage.nextButton1.click();
-  await homePage.waitForProduct("Apple monitor 24");
+  await expect.soft(homePage.productAppleMonitor).toBeVisible();
   let nextItems = await homePage.getProductTitles();
   expect(nextItems.length).toBeGreaterThan(0);
   expect(nextItems).not.toEqual(firstPageItems);
 
   await homePage.previousButton1.click();
-  await homePage.waitForProduct("Samsung galaxy s7");
+  await expect.soft(homePage.productSamsungS7).toBeVisible();
   let previousItems = await homePage.getProductTitles();
   expect(previousItems).not.toEqual(nextItems);
 
   await homePage.nextButton1.click();
-  await homePage.waitForProduct("Apple monitor 24");
+  await expect.soft(homePage.productAppleMonitor).toBeVisible();
   let againNextItems = await homePage.getProductTitles();
-  expect(nextItems.length).toBeGreaterThan(0);
-  expect(previousItems).toEqual(againNextItems);
+  await expect.soft(nextItems.length).toBeGreaterThan(0);
+  await expect(previousItems).toEqual(againNextItems);
 });

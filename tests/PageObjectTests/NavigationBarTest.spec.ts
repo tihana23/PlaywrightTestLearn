@@ -1,67 +1,23 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../../pages/HomePage";
-import { AboutUsPage } from "../../pages/AboutUsPage";
-import { CartPage } from "../../pages/CartPage";
-import { LoginPage } from "../../pages/LoginPage";
-import { RegisterPage } from "../../pages/RegisterPage";
-import { NavigationBar } from "../../pages/NavigationBar";
+import { test, expect } from "../fixtures/basePage";
+test("Verify  navigation bar is visible on Home page", async ({
+  navigationBarPage,
+ homePage}) => {
 
-test("Verify  navigation bar is visible on Home page", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const navigationBar = new NavigationBar(page);
   await homePage.goTo();
-  await navigationBar.verifyAllNavBarLinksAreVisible();
+  await expect.soft(navigationBarPage.homeLink).toBeVisible();
+  await expect.soft(navigationBarPage.contactsLink).toBeVisible();
+  await expect.soft(navigationBarPage.aboutUsLink).toBeVisible();
+  await expect.soft(navigationBarPage.cartLink).toBeVisible();
+  await expect(navigationBarPage.loginLink).toBeVisible();
 });
-test("Verify  navigation bar is visible on Cart page", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const navigationBar = new NavigationBar(page);
-  await homePage.goTo();
-  await navigationBar.navigateToCart();
-  await navigationBar.verifyAllNavBarLinksAreVisible();
-});
+test("Verify  navigation bar is visible on Cart page", async ({   navigationBarPage,
+ homePage, cartPage }) => {
 
-test("Verify that About us can be oppened correctly", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const aboutUsPage = new AboutUsPage(page);
-  const navigationBar = new NavigationBar(page);
   await homePage.goTo();
-  await navigationBar.navigateToAboutUs();
-  await aboutUsPage.verifyThatAboutUsElementsAreVisible();
-});
-
-test("Verify that Chart page is oppened correctly", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const cartPage = new CartPage(page);
-  const navigationBar = new NavigationBar(page);
-  await homePage.goTo();
-  await navigationBar.navigateToCart();
-  await cartPage.verifyVisabilityAllElementsInCartPage();
-});
-
-test("Verify that Login popup is oppened correctly", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const loginPage = new LoginPage(page);
-  const navigationBar = new NavigationBar(page);
-  await homePage.goTo();
-  await navigationBar.navigateToLogin();
-  await expect(loginPage.loginHeading).toBeVisible();
-});
-test("Verify that Register popup is oppened correctly", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const registerPage = new RegisterPage(page);
-  const navigationBar = new NavigationBar(page);
-  await homePage.goTo();
-  await navigationBar.navigateToSignUp();
-  await registerPage.verifyThatAllElementsAreVisibleOnRegisterPage();
-});
-
-test("Verify that Logout button is woking correctly", async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const homePage = new HomePage(page);
-  const navigationBar = new NavigationBar(page);
-  await homePage.goTo();
-  await navigationBar.navigateToLogin();
-  await loginPage.login("tihana", "123456");
-  await loginPage.verifyLoginUser("tihana");
-  await navigationBar.navigateToLogOut();
+  await cartPage.goTo();
+  await expect.soft(navigationBarPage.homeLink).toBeVisible();
+  await expect.soft(navigationBarPage.contactsLink).toBeVisible();
+  await expect.soft(navigationBarPage.aboutUsLink).toBeVisible();
+  await expect.soft(navigationBarPage.cartLink).toBeVisible();
+  await expect(navigationBarPage.loginLink).toBeVisible();
 });

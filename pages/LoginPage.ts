@@ -1,6 +1,5 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { HomePage } from "./HomePage";
-import { NavigationBar } from "./NavigationBar";
+
 export class LoginPage {
   readonly page: Page;
   readonly usernameInput: Locator;
@@ -12,6 +11,10 @@ export class LoginPage {
   readonly passwordLabel: Locator;
   readonly closeXButton: Locator;
 
+  readonly logoutLink: Locator;
+  readonly loginLink: Locator;
+ private lastDialogMessage: string;
+
   constructor(page: Page) {
     this.page = page;
     this.usernameInput = page.locator("#loginusername");
@@ -22,6 +25,17 @@ export class LoginPage {
     this.loginHeading = page.getByRole("heading", { name: "Log in" });
     this.userNameLabel = page.getByLabel("Log in").getByText("Username:");
     this.passwordLabel = page.getByLabel("Log in").getByText("Password:");
+    this.loginLink = page.getByRole("link", { name: "Log in" });
+
+    this.logoutLink = page.locator("#logout2");
+  }
+  async goTo() {
+    await this.loginLink.click();
+  }
+  async goToLogout() {
+    await expect.soft(this.loginLink).not.toBeVisible();
+    await this.logoutLink.click();
+    await expect(this.loginLink).toBeVisible();
   }
 
   async login(username: string, password: string) {
@@ -37,13 +51,13 @@ export class LoginPage {
       `Welcome ${expectedUsername}`
     );
   }
-
-  async logInWithRightCreds() {
-    const homePage = new HomePage(this.page);
-    const navigationBar = new NavigationBar(this.page);
-    await homePage.goTo();
-    await navigationBar.navigateToLogin();
-    await this.login("tihana", "123456");
-    await this.page.waitForTimeout(1000);
+  async setupDialogHandler() {
+    this.page.on("dialog", async (dialog) => {
+      this.lastDialogMessage = dialog.message();
+      await dialog.accept();
+    });
+  }
+  getDialogMessage(): string {
+    return this.lastDialogMessage;
   }
 }
