@@ -261,7 +261,6 @@ test("Verify that Login user with added product to a cart after logout than logi
   await loginPage.login("tihana", "123456");
   await loginPage.verifyLoginUser("tihana");
   await cartPage.goTo();
-  await cartPage.goTo();
   await expect.soft(cartPage.cartSamsungS6).toBeVisible();
   await expect(cartPage.cartNokia).toBeVisible();
 });
